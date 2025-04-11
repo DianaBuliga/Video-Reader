@@ -1,107 +1,90 @@
-import cv2
-import numpy as np
+import base64
+from pathlib import Path
 from ultralytics import YOLO
-import matplotlib.pyplot as plt
+import cv2
+import json
+
+from websocketServer.websocketHandler.websocket_send import send_data_to_client
+
+model = YOLO("yolo11n.pt")  # Load YOLO model
 
 
-def detect_objects(image_path):
-    """
-    Detect objects in an image using YOLOv8.
+async def send_yolo_detections(path):
+    file_path = Path(path)
+    print('send', path)
 
-    Args:
-        image_path: Path to the input image
+    # Determine if it's a photo or a video based on extension
+    image_extensions = {'.jpg', '.jpeg', '.png', '.bmp'}
+    is_image = file_path.suffix.lower() in image_extensions
 
-    Returns:
-        Detected objects and class labels.
-    """
-    # Load YOLO model
-    model = YOLO('yolo11n.pt')  # Load the model
+    if is_image:
+        # Handle image detection
+        image = cv2.imread(str(file_path))
+        if image is None:
+            print(" Failed to read the image.")
+            return
+        await process_frame_and_send(image)
+    else:
+        cap = cv2.VideoCapture(str(file_path))
+        if not cap.isOpened():
+            print(" Failed to open video.")
+            return
 
-    # Read image
-    image = cv2.imread(image_path)
-    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                break
+            await process_frame_and_send(frame)
 
-    # Perform detection
-    results = model(image_rgb)[0]
-
-    # Create a copy of the image for drawing
-    annotated_image = image_rgb.copy()
-
-    # Generate random colors for classes
-    np.random.seed(42)  # For consistent colors
-    colors = np.random.randint(0, 255, size=(100, 3), dtype=np.uint8)
-
-    # To hold class names and their corresponding colors
-    class_labels = {}
-
-    # Process detections
-    boxes = results.boxes
-
-    return boxes, results.names, annotated_image, colors
+        cap.release()
 
 
-def show_results(image_path, confidence_threshold):
-    """
-    Show original image and detection results side by side.
+async def process_frame_and_send(frame):
+    # Run YOLO detection on the frame
+    results = model(frame)[0]
 
-    Args:
-        image_path: Path to the input image
-        confidence_threshold: Minimum confidence score for detections
-    """
-    # Read original image
-    original_image = cv2.imread(image_path)
-    original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
+    _, buffer = cv2.imencode('.jpg', frame)
+    frame_data_base64 = base64.b64encode(buffer).decode('utf-8')
 
-    # Get detection results
-    boxes, class_names, annotated_image, colors = detect_objects(image_path)
+    message_info, detections = create_message(results)
 
-    # Process each detected object and apply confidence threshold filtering
-    class_labels = {}
-    for box in boxes:
-        # Get box coordinates
+    data = [
+        {
+            "type": 'image',
+            "imageType": 'jpg',
+            "count": len(detections),
+            "objects": detections,
+            "frame": frame_data_base64
+        },
+        {
+            "type": 'data',
+            "objects": message_info
+        }]
+
+    message = json.dumps(data)
+    await send_data_to_client(message)
+
+
+def create_message(results):
+    data = {}
+    detections = []
+
+    for box in results.boxes:
+        cls = int(box.cls[0])
+        class_name = results.names[cls]
         x1, y1, x2, y2 = map(int, box.xyxy[0])
+        detections.append({
+            "class": class_name,
+            "box": [x1, y1, x2, y2]
+        })
 
-        # Get confidence score
-        confidence = float(box.conf[0])
+        if class_name not in data:
+            data[class_name] = {
+                "number": 1,
+                "otherInfo": [detections]  # You can customize this
+            }
+        else:
+            data[class_name]["number"] += 1
+            data[class_name]["otherInfo"].append(detections)
 
-        # Only show detections above confidence threshold
-        if confidence > confidence_threshold:
-            # Get class id and name
-            class_id = int(box.cls[0])
-            class_name = class_names[class_id]
-
-            # Get color for this class
-            color = colors[class_id % len(colors)].tolist()
-
-            # Draw bounding box
-            cv2.rectangle(annotated_image, (x1, y1), (x2, y2), color, 2)
-
-            # Store class name and color for legend
-            class_labels[class_name] = color
-
-    # Create figure
-    plt.figure(figsize=(15, 7))
-
-    # Show original image
-    plt.subplot(1, 2, 1)
-    plt.title('Original Image')
-    plt.imshow(original_image)
-    plt.axis('off')
-
-    # Show detection results
-    plt.subplot(1, 2, 2)
-    plt.title('Detected Objects')
-    plt.imshow(annotated_image)
-    plt.axis('off')
-
-    # Create legend
-    legend_handles = []
-    for class_name, color in class_labels.items():
-        normalized_color = np.array(color) / 255.0  # Normalize the color
-        legend_handles.append(plt.Line2D([0], [0], marker='o', color='w', label=class_name,
-                                         markerfacecolor=normalized_color, markersize=10))
-
-    plt.legend(handles=legend_handles, loc='upper right', title='Classes')
-
-    plt.tight_layout()
-    plt.show()
+    return data, detections

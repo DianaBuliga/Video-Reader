@@ -2,7 +2,8 @@ import json
 
 from websocketServer.messages.message_handler import message_handlers
 from websocketServer.messages.open_file import handle_open_file
-from websocketServer.messages.play_video import handle_play_video
+from websocketServer.messages.start_play import handle_start_play
+from websocketServer.messages.stop_play import handle_stop_play
 from websocketServer.sharedState import SharedState
 
 
@@ -17,8 +18,10 @@ async def handle_connection(websocket):
             try:
                 data = json.loads(message)
                 msg_type = data.get("type")
+                print(msg_type)
 
                 handler = message_handlers.get(msg_type)
+
                 if handler:
                     await handler(websocket, data)
                 else:

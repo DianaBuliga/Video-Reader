@@ -6,12 +6,13 @@ class SharedState:
             cls._instance = super(SharedState, cls).__new__(cls)
             cls._instance.clients_connected = set()
             cls._instance.selected_file_path = None
+            cls._instance.video_processing_active = False
         return cls._instance
 
-    def set_selected_file_path(self, path: str):
+    def set_selected_file_path(self, path):
         self.selected_file_path = path
 
-    def get_selected_file_path(self) -> str:
+    def get_selected_file_path(self):
         return self.selected_file_path
 
     def add_client(self, client):
@@ -22,3 +23,10 @@ class SharedState:
 
     def get_clients(self):
         return self.clients_connected
+
+    def set_video_processing_active(self, value):
+        print('video_active_changed', value)
+        self.video_processing_active = value
+
+    def get_video_processing_active(self):
+        return self.video_processing_active

@@ -4,14 +4,15 @@ from ultralytics import YOLO
 import cv2
 import json
 
+from websocketServer.sharedState import SharedState
 from websocketServer.websocketHandler.websocket_send import send_data_to_client
 
 model = YOLO("yolo11n.pt")  # Load YOLO model
+state = SharedState()
 
 
-async def send_yolo_detections(path):
-    file_path = Path(path)
-    print('send', path)
+async def send_yolo_detections():
+    file_path = Path(state.get_selected_file_path())
 
     # Determine if it's a photo or a video based on extension
     image_extensions = {'.jpg', '.jpeg', '.png', '.bmp'}
@@ -30,7 +31,7 @@ async def send_yolo_detections(path):
             print(" Failed to open video.")
             return
 
-        while cap.isOpened():
+        while cap.isOpened() and state.get_video_processing_active():
             ret, frame = cap.read()
             if not ret:
                 break
@@ -81,10 +82,10 @@ def create_message(results):
         if class_name not in data:
             data[class_name] = {
                 "number": 1,
-                "otherInfo": [detections]  # You can customize this
+                "otherInfo": {'type': 'string'}  # You can customize this
             }
         else:
             data[class_name]["number"] += 1
-            data[class_name]["otherInfo"].append(detections)
+            # data[class_name]["otherInfo"].append({'type': 'string'})
 
     return data, detections

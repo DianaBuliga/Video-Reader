@@ -31,11 +31,17 @@ async def send_yolo_detections():
             print(" Failed to open video.")
             return
 
+        start_time = state.get_video_position()
+        cap.set(cv2.CAP_PROP_POS_MSEC, start_time)
+
         while cap.isOpened() and state.get_video_processing_active():
             ret, frame = cap.read()
             if not ret:
                 break
             await process_frame_and_send(frame)
+
+            current_pos = cap.get(cv2.CAP_PROP_POS_MSEC)
+            state.set_video_position(current_pos)
 
         cap.release()
 
@@ -43,6 +49,8 @@ async def send_yolo_detections():
 async def process_frame_and_send(frame):
     # Run YOLO detection on the frame
     results = model(frame)[0]
+
+    height, width = frame.shape[:2]
 
     _, buffer = cv2.imencode('.jpg', frame)
     frame_data_base64 = base64.b64encode(buffer).decode('utf-8')
@@ -55,7 +63,9 @@ async def process_frame_and_send(frame):
             "imageType": 'jpg',
             "count": len(detections),
             "objects": detections,
-            "frame": frame_data_base64
+            "frame": frame_data_base64,
+            "width": width,
+            "height": height
         },
         {
             "type": 'data',
@@ -82,10 +92,9 @@ def create_message(results):
         if class_name not in data:
             data[class_name] = {
                 "number": 1,
-                "otherInfo": {'type': 'string'}  # You can customize this
+                "otherInfo": {'type': 'string'}
             }
         else:
             data[class_name]["number"] += 1
-            # data[class_name]["otherInfo"].append({'type': 'string'})
 
     return data, detections

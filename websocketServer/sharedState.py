@@ -7,6 +7,7 @@ class SharedState:
             cls._instance.clients_connected = set()
             cls._instance.selected_file_path = None
             cls._instance.video_processing_active = False
+            cls._instance.video_position = 0
         return cls._instance
 
     def set_selected_file_path(self, path):
@@ -30,3 +31,9 @@ class SharedState:
 
     def get_video_processing_active(self):
         return self.video_processing_active
+
+    def set_video_position(self, pos):
+        self.video_position = pos
+
+    def get_video_position(self):
+        return self.video_position

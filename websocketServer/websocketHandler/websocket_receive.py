@@ -4,6 +4,7 @@ from websocketServer.messages.message_handler import message_handlers
 from websocketServer.messages.open_file import handle_open_file
 from websocketServer.messages.start_play import handle_start_play
 from websocketServer.messages.stop_play import handle_stop_play
+from websocketServer.messages.jump_to_beginning import handle_jump_to_beginning
 from websocketServer.sharedState import SharedState
 
 

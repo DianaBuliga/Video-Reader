@@ -1,5 +1,4 @@
 import asyncio
-import json
 
 from object_detection import send_yolo_detections
 from websocketServer.messages.message_handler import message_handler

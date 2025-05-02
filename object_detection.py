@@ -38,15 +38,14 @@ async def send_yolo_detections():
             ret, frame = cap.read()
             if not ret:
                 break
-            await process_frame_and_send(frame)
-
             current_pos = cap.get(cv2.CAP_PROP_POS_MSEC)
             state.set_video_position(current_pos)
+            await process_frame_and_send(frame, current_pos/1000.0)
 
         cap.release()
 
 
-async def process_frame_and_send(frame):
+async def process_frame_and_send(frame, current_pos):
     # Run YOLO detection on the frame
     results = model(frame)[0]
 
@@ -60,17 +59,24 @@ async def process_frame_and_send(frame):
     data = [
         {
             "type": 'image',
-            "imageType": 'jpg',
-            "count": len(detections),
-            "objects": detections,
-            "frame": frame_data_base64,
-            "width": width,
-            "height": height
+            "frameData": {
+                "imageType": 'jpg',
+                "count": len(detections),
+                "objects": detections,
+                "frame": frame_data_base64,
+                "width": width,
+                "height": height
+            }
         },
         {
             "type": 'data',
             "objects": message_info
-        }]
+        },
+        {
+            "type": 'player',
+            "timeFrame": current_pos
+        }
+    ]
 
     message = json.dumps(data)
     await send_data_to_client(message)

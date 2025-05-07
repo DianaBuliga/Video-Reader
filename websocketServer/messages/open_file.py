@@ -15,7 +15,7 @@ async def handle_open_file(websocket, data):
 
     if not file_path:
         await websocket.send(json.dumps({
-            "type": "openFile_response",
+            "type": "response",
             "status": "error",
             "message": "Missing 'path' in request"
         }))
@@ -27,9 +27,9 @@ async def handle_open_file(websocket, data):
         state.set_selected_file_path(file_path)
 
         await websocket.send(json.dumps({
-            "type": "openFile_response",
+            "type": "response",
             "status": "success",
-            "message": "File path received and valid",
+            "message": "File received and valid",
             "path": file_path
         }))
     else:

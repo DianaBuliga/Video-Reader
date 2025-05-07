@@ -6,6 +6,7 @@ from websocketServer.messages.start_play import handle_start_play
 from websocketServer.messages.stop_play import handle_stop_play
 from websocketServer.messages.jump_to_beginning import handle_jump_to_beginning
 from websocketServer.sharedState import SharedState
+import logging
 
 
 async def handle_connection(websocket):
@@ -16,6 +17,7 @@ async def handle_connection(websocket):
     try:
         async for message in websocket:
             print(f" Received: {message}")
+            logging.info(f'Message received: {message}')
             try:
                 data = json.loads(message)
                 msg_type = data.get("type")
@@ -26,11 +28,13 @@ async def handle_connection(websocket):
                 if handler:
                     await handler(websocket, data)
                 else:
+                    logging.error(f"Unknown message type: {msg_type}")
                     await websocket.send(json.dumps({
                         "type": "error",
                         "message": f"Unknown message type: {msg_type}"
                     }))
             except json.JSONDecodeError:
+                logging.error('Invalid JSON')
                 await websocket.send(json.dumps({
                     "type": "error",
                     "message": "Invalid JSON"
@@ -41,3 +45,4 @@ async def handle_connection(websocket):
         state.remove_client(websocket)
 
         print(" Client disconnected")
+        logging.info('Client disconnected')

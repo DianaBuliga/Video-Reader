@@ -4,14 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a716eea2-7511-4743-a712-04da3b4926be" name="Changes" comment="added stop_video event">
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/videoReaderBackend.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/object_detection.py" beforeDir="false" afterPath="$PROJECT_DIR$/object_detection.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/websocketServer/sharedState.py" beforeDir="false" afterPath="$PROJECT_DIR$/websocketServer/sharedState.py" afterDir="false" />
+    <list default="true" id="a716eea2-7511-4743-a712-04da3b4926be" name="Changes" comment="handle jump_to_beginning">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/websocketServer/messages/open_file.py" beforeDir="false" afterPath="$PROJECT_DIR$/websocketServer/messages/open_file.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/websocketServer/messages/start_play.py" beforeDir="false" afterPath="$PROJECT_DIR$/websocketServer/messages/start_play.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/websocketServer/messages/stop_play.py" beforeDir="false" afterPath="$PROJECT_DIR$/websocketServer/messages/stop_play.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/websocketServer/websocketHandler/websocket_receive.py" beforeDir="false" afterPath="$PROJECT_DIR$/websocketServer/websocketHandler/websocket_receive.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/websocketServer/websocketHandler/websocket_send.py" beforeDir="false" afterPath="$PROJECT_DIR$/websocketServer/websocketHandler/websocket_send.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -193,13 +193,39 @@
       <option name="project" value="LOCAL" />
       <updated>1745435247124</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="at stop event, save the timestamp">
+      <option name="closed" value="true" />
+      <created>1745520176445</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1745520176446</updated>
+    </task>
+    <task id="LOCAL-00005" summary="at stop event, save the timestamp">
+      <option name="closed" value="true" />
+      <created>1745520198443</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1745520198443</updated>
+    </task>
+    <task id="LOCAL-00006" summary="handle jump_to_beginning">
+      <option name="closed" value="true" />
+      <created>1746190974217</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1746190974217</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="video read and send to electron" />
     <MESSAGE value="enable data receive and send message" />
     <MESSAGE value="added stop_video event" />
-    <option name="LAST_COMMIT_MESSAGE" value="added stop_video event" />
+    <MESSAGE value="at stop event, save the timestamp" />
+    <MESSAGE value="handle jump_to_beginning" />
+    <option name="LAST_COMMIT_MESSAGE" value="handle jump_to_beginning" />
   </component>
 </project>

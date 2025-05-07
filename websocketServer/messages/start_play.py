@@ -8,7 +8,6 @@ from websocketServer.sharedState import SharedState
 @message_handler("startPlay")
 async def handle_start_play(websocket, data):
     state = SharedState()
-    print('video handler receive', state.get_selected_file_path())
     state.set_video_processing_active(True)
 
     asyncio.create_task(send_yolo_detections())

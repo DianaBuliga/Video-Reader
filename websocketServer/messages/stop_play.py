@@ -8,5 +8,4 @@ from websocketServer.sharedState import SharedState
 @message_handler("stopPlay")
 async def handle_stop_play(websocket, data):
     state = SharedState()
-    print('stop play received')
     state.set_video_processing_active(False)
